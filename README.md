@@ -1,4 +1,4 @@
-# Predictive Automotive Climate Control System
+# Automotive Climate Control System
 
 An ESP32-based automotive climate-control prototype that reads cabin temperature and automatically adjusts a vehicle's HVAC controls using servo motors.
 
@@ -108,7 +108,7 @@ The first CAD models will focus only on correct dimensions and basic geometry.
 ## Repository Structure
 
 ```text
-Predictive-Automotive-Climate-Control-System/
+Automotive-Climate-Control-System/
 ├── cad/
 ├── docs/
 ├── firmware/
