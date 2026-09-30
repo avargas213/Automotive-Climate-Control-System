@@ -1,51 +1,66 @@
-# Predictive Automotive Climate Control System
+# Automotive Climate Control System
 
-An ESP32-based automotive climate-control prototype that reads cabin temperature and automatically adjusts a vehicle's HVAC controls using servo motors.
+An ESP32-based automotive HVAC automation project that reads vehicle cabin temperature and uses servo motors to physically adjust HVAC controls.
 
 ## Project Goal
 
-The goal of this project is to create a simple closed-loop climate-control system for a vehicle.
+The goal is to build a simple closed-loop climate-control system for a vehicle that can:
 
-The system will:
-
-- Read cabin temperature using a DS18B20 temperature sensor
-- Compare the current temperature to a fixed target temperature
-- Decide how much cooling is needed
-- Use servo motors to physically control the vehicle's HVAC temperature knob and fan buttons
+- Read cabin temperature using a DS18B20 sensor
+- Compare the measured temperature with a target temperature
+- Select an appropriate cooling level
+- Control the vehicle HVAC temperature knob and fan buttons using servo motors
 - Reduce cooling as the cabin approaches the target temperature
-- Maintain the cabin near the target temperature
+- Maintain the cabin near the desired temperature
 
-For the first version, the system is focused on **cooling only**.
+The first version is focused on **cooling only**.
 
-## Current Target
+## Current Status
 
-- Target temperature: **75°F**
-- Comfort range: **73°F to 77°F**
-- Temperature reading interval: **1 second**
-- Minimum time between HVAC adjustments: **15 seconds**
+### Completed
+
+- Built and tested the ESP32 control circuit
+- Verified DS18B20 temperature input
+- Verified independent control of all three servo motors
+- Verified the external servo power setup and shared ground
+- Added temperature-based HVAC control logic in C++
+- Added a 15-second minimum interval between HVAC adjustments
+- Defined the first cooling-control strategy and fan-level logic
+
+### In Progress
+
+- Measuring the vehicle HVAC controls
+- Designing CAD mounts for the temperature-knob and fan-button servos
+- Designing servo adapters / button pushers
+- Preparing the system for physical in-vehicle integration
+
+### Next Steps
+
+1. Finish CAD measurements and servo-mount designs
+2. 3D print the first mount prototypes
+3. Mechanically attach and calibrate the temperature-knob servo
+4. Mechanically attach and calibrate the fan-up and fan-down servos
+5. Enable and calibrate actuator commands in the integrated firmware
+6. Perform initial in-vehicle tests
+7. Tune temperature thresholds and servo behavior
+8. Move the working breadboard circuit to a soldered prototyping board
+9. Repeat vehicle tests and document final system performance
 
 ## Current Hardware
 
-Already available:
-
 - ESP32
 - DS18B20 temperature sensor
-- Breadboard
-- Jumper wires
-- Resistors and other basic components
-
-Planned hardware:
-
 - 3 MG90S metal-gear micro servos
-  - 1 for the HVAC temperature knob
-  - 1 for the fan-up button
-  - 1 for the fan-down button
-- External 5V servo power source
-- 1000 µF electrolytic capacitor
-- USB-A power pigtail
-- 3D-printed servo mounts and adapters
+  - 1 temperature-knob servo
+  - 1 fan-up button servo
+  - 1 fan-down button servo
+- External 5 V servo power source
+- 1000 uF electrolytic capacitor
+- USB power wiring
+- Breadboard and jumper wires
+- Resistors and supporting components
 
-## Software
+## Firmware
 
 The current firmware is written in C++ for the ESP32.
 
@@ -56,119 +71,88 @@ Libraries:
 - DallasTemperature
 - ESP32Servo
 
-The current firmware does not use:
+The controller currently:
 
-- Wi-Fi
-- A web interface
-- A data logger
-- A temperature prediction model
+- Reads the DS18B20 once per second
+- Uses a fixed target temperature of 75 F
+- Uses a 73 F to 77 F comfort range
+- Selects a cooling level based on temperature error
+- Tracks the desired fan level
+- Selects a temperature-knob setting
+- Limits HVAC adjustments to no more than once every 15 seconds
 
-These features may be added later if they improve the final system.
+The main integrated firmware currently keeps physical actuators disabled by default while the mechanical mounts and calibration are still being developed. Servo actuation has been bench-tested separately.
 
-## Control Logic
-
-The controller reads the cabin temperature and selects an HVAC setting based on how far the cabin is from the 75°F target.
-
-Initial control strategy:
+## Initial Control Strategy
 
 | Cabin Temperature | Mode | Fan Level | HVAC Temperature |
 | --- | --- | ---: | --- |
-| Above 85°F | Maximum Cooling | 7 | Maximum Cold |
-| 81–85°F | Strong Cooling | 5 | Maximum Cold |
-| 78–81°F | Moderate Cooling | 3 | Cold |
-| 77–78°F | Gentle Cooling | 2 | Cool |
-| 73–77°F | Maintain | 1 | Maintain |
-| Below 73°F | Too Cold | 1 | Minimum Cooling |
+| Above 85 F | Maximum Cooling | 7 | Maximum Cold |
+| 81-85 F | Strong Cooling | 5 | Maximum Cold |
+| 78-81 F | Moderate Cooling | 3 | Cold |
+| 77-78 F | Gentle Cooling | 2 | Cool |
+| 73-77 F | Maintain | 1 | Maintain |
+| Below 73 F | Too Cold | 1 | Minimum Cooling |
 
-These values are starting points and will be adjusted after real vehicle testing.
-
-## Fan Control
-
-The vehicle fan is controlled using two servo motors that press the physical fan-up and fan-down buttons.
-
-Because the ESP32 does not directly know the vehicle's current fan level, the system will first synchronize the fan state by pressing the fan-up button enough times to guarantee that the fan reaches its maximum level.
-
-The software can then track later fan-level changes.
+These are starting values and will be tuned after vehicle testing.
 
 ## Mechanical Design
 
-Custom parts will be designed to mount the servos to the vehicle HVAC controls.
+The next phase of the project is the physical interface between the servos and the vehicle HVAC controls.
 
 Planned CAD parts include:
 
 - Temperature-knob servo mount
-- Knob-to-servo adapter or coupler
+- Knob-to-servo coupler / adapter
 - Fan-up button servo mount
 - Fan-down button servo mount
-- Button pushers
-- Possible electronics enclosure
+- Servo button pushers
+- Optional electronics enclosure
 
-The first CAD models will focus only on correct dimensions and basic geometry.
+The first CAD iteration will prioritize reliable geometry, non-destructive mounting, and easy adjustment.
 
 ## Repository Structure
 
 ```text
-Predictive-Automotive-Climate-Control-System/
+Automotive-Climate-Control-System/
 ├── cad/
+│   ├── source/
+│   └── stl/
 ├── docs/
 ├── firmware/
 ├── hardware/
+│   ├── components/
+│   ├── protoboard/
+│   └── wiring/
 ├── images/
 └── README.md
 ```
 
-## Current Status
+## Project Background
 
-### Completed
+This project is a follow-up to my earlier **Car Cabin Temperature Prediction System**.
 
-- Created project repository
-- Defined V1 system architecture
-- Defined cooling-only control strategy
-- Created initial ESP32 firmware
-- Added DS18B20 temperature sensing
-- Added simulated servo-control logic
-- Added 15-second actuator-change protection
+The earlier project focused on temperature sensing, thermal modeling, prediction, and repeated vehicle testing. This project shifts toward embedded control, electronics, servo actuation, CAD, and electromechanical integration.
 
-### In Progress
+## Current Development Stage
 
-- Testing firmware with the temperature sensor
-- Measuring the vehicle HVAC controls
-- Creating initial CAD models
-- Preparing servo hardware
+The electronics and individual actuator functions are working on the bench. The project has **not yet completed mechanical installation or full closed-loop in-vehicle validation**.
 
-### Next Steps
-
-1. Test the current firmware with the DS18B20
-2. Measure the HVAC knob and buttons
-3. Create simple MG90S reference geometry in CAD
-4. Design initial servo mounts
-5. Bench-test each servo when the hardware arrives
-6. Calibrate servo rest, press, and knob angles
-7. Integrate all three servos on a breadboard
-8. Install the prototype in the vehicle
-9. Tune the temperature-control thresholds
-10. Perform repeated vehicle testing
-11. Improve the mechanical design
-12. Move the electronics to a cleaner permanent prototype if needed
+The current development focus is CAD mounting, mechanical integration, and vehicle testing.
 
 ## Future Improvements
 
 Possible later additions include:
 
 - User-selectable target temperature
-- Web interface
-- Temperature prediction
+- Temperature prediction integration
 - Rate-of-change-based control
 - More advanced closed-loop control
+- Web interface
+- Data logging and performance analysis
 - Additional HVAC controls
-- Improved data logging and validation
-
-## Background
-
-This project is a separate follow-up to an earlier **Car Cabin Temperature Prediction System** project.
-
-The earlier project focused on temperature sensing, thermal modeling, prediction, and repeated vehicle testing. This project focuses more heavily on embedded control, electronics, servo actuation, CAD, and electromechanical integration.
+- Improved permanent electronics packaging
 
 ## Disclaimer
 
-This is an experimental prototype intended for educational and engineering-development purposes. The system should be tested carefully and should not interfere with safe vehicle operation.
+This is an experimental prototype intended for educational and engineering-development purposes. The system should be tested carefully and must not interfere with safe vehicle operation.
